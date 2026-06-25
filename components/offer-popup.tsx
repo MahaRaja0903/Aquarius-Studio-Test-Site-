@@ -28,54 +28,68 @@ export default function OfferPopup() {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 transition-opacity duration-300 ${
-        isVisible ? 'bg-black/60' : 'bg-black/0 pointer-events-none'
+      onClick={handleClose}
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${
+        isVisible ? 'bg-black/80 backdrop-blur-sm' : 'bg-black/0 pointer-events-none'
       }`}
     >
       <div
-        className={`bg-black border-2 border-accent relative w-full sm:max-w-md shadow-2xl transform transition-all duration-300 ${
-          isVisible ? 'translate-y-0 opacity-100 sm:scale-100' : 'translate-y-4 opacity-0 sm:scale-95'
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-[#0a0a0a] border border-accent/30 rounded-lg relative w-full max-w-[400px] shadow-[0_25px_60px_rgba(0,0,0,0.85)] transform transition-all duration-300 overflow-hidden ${
+          isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
         }`}
       >
-        {/* Close Button */}
+        {/* Decorative corner accents */}
+        <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-accent/20 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-accent/20 pointer-events-none" />
+
+        {/* Close Button (large touch target for mobile friendliness) */}
         <button
           onClick={handleClose}
-          className="absolute top-3 right-3 p-2 hover:bg-secondary transition-colors z-10"
-          aria-label="Close"
+          className="absolute top-4 right-4 p-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-accent/80 hover:text-accent transition-all z-10 hover:scale-105 active:scale-95"
+          aria-label="Close dialog"
         >
-          <X size={18} className="text-accent" />
+          <X size={16} />
         </button>
 
         {/* Content */}
-        <div className="p-5 sm:p-8 text-center">
-          <div className="mb-2 sm:mb-4">
-            <p className="text-xs sm:text-sm tracking-widest uppercase text-accent font-semibold">
-              Exclusive Offer
-            </p>
+        <div className="p-6 sm:p-8 text-center flex flex-col items-center">
+          <div className="mb-2">
+            <div className="inline-flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+              <span className="text-[0.58rem] tracking-[0.3em] uppercase text-accent font-bold">
+                Exclusive Offer
+              </span>
+            </div>
           </div>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-2 sm:mb-4 text-white">
+          <h2 
+            className="text-4xl sm:text-5xl font-black mb-2 text-white font-display tracking-tight"
+            style={{ textShadow: '0 0 20px rgba(212, 175, 55, 0.15)' }}
+          >
             20% OFF
           </h2>
 
-          <p className="text-base sm:text-lg text-foreground mb-4 sm:mb-6">
+          <p className="text-sm sm:text-base text-[#F5F5F5] font-semibold mb-4 sm:mb-5">
             Your First Tattoo or Piercing
           </p>
 
-          <div className="bg-secondary border border-border p-3 sm:p-4 mb-4 sm:mb-8">
-            <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">Use Code</p>
-            <p className="text-xl sm:text-2xl font-bold text-accent tracking-widest">
+          {/* Promo Code Box */}
+          <div className="bg-[#121212] border border-white/[0.05] rounded-md p-3 w-full mb-4 sm:mb-5 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+            <p className="text-[0.55rem] tracking-[0.2em] text-muted-foreground uppercase mb-0.5">Promo Code</p>
+            <p className="text-xl sm:text-2xl font-black text-accent tracking-widest select-all">
               AQUA20
             </p>
           </div>
 
-          <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
+          <p className="text-[0.62rem] text-[#9A9A9A] mb-5 sm:mb-6 leading-relaxed max-w-[280px]">
             Limited time offer. Valid for new clients only. Cannot be combined with other offers.
           </p>
 
           <button
             onClick={() => { handleClose(); router.push('/calculator') }}
-            className="w-full px-6 py-3 sm:py-4 bg-accent text-accent-foreground font-semibold tracking-wide text-sm sm:text-base hover:bg-opacity-90 transition-all duration-200"
+            className="w-full px-6 py-3.5 bg-accent text-accent-foreground font-bold tracking-widest text-[0.65rem] uppercase hover:bg-accent/95 hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all duration-200 rounded-sm"
           >
             CLAIM OFFER
           </button>
