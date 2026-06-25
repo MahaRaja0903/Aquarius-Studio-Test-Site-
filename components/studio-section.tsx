@@ -14,7 +14,7 @@ const studioItems: StudioItem[] = [
     type: 'video',
     src: '/studio/home_page_video.mp4',
     poster: '/studio/studio.JPG',
-    alt: 'Aquarius Tattoo Studio Walkthrough Tour'
+    alt: 'Stunning Chest Tattoo Showcase Reel'
   },
   {
     type: 'image',
@@ -121,7 +121,7 @@ export default function StudioSection() {
                       />
                     </div>
                     <span className="mt-4 text-[0.58rem] tracking-[0.25em] font-bold text-white/90 uppercase group-hover:text-white transition-colors">
-                      *
+                      Watch Reel
                     </span>
                   </div>
                 </div>
@@ -150,7 +150,7 @@ export default function StudioSection() {
               {/* Caption Tag (displays on hover at the bottom left) */}
               <div className="absolute bottom-4 left-4 z-20 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
                 <span className="text-[0.55rem] tracking-[0.2em] font-bold text-[#D4AF37] uppercase block mb-0.5">
-                  {item.type === 'video' ? 'Video Tour' : 'Studio Space'}
+                  {item.type === 'video' ? 'Featured Reel' : 'Studio Space'}
                 </span>
                 <span className="text-white text-xs font-semibold">
                   {item.alt}
@@ -222,7 +222,7 @@ export default function StudioSection() {
           {/* Caption and Indicator at the bottom */}
           <div className="mt-8 flex flex-col items-center text-center gap-2 px-6 max-w-xl z-20">
             <p className="text-[#D4AF37] text-[0.65rem] tracking-[0.25em] font-bold uppercase">
-              {studioItems[selectedIndex].type === 'video' ? 'Interactive Video Tour' : 'Studio Showcase'}
+              {studioItems[selectedIndex].type === 'video' ? 'Featured Tattoo Showcase' : 'Studio Showcase'}
             </p>
             <h3 className="text-white text-lg font-bold">
               {studioItems[selectedIndex].alt}

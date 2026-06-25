@@ -64,27 +64,31 @@ export default function OfferPopup() {
           </div>
 
           <h2 
-            className="text-4xl sm:text-5xl font-black mb-2 text-white font-display tracking-tight"
+            className="text-2xl sm:text-3xl font-black mb-1 text-white font-display tracking-tight uppercase"
             style={{ textShadow: '0 0 20px rgba(212, 175, 55, 0.15)' }}
           >
-            20% OFF
+            ₹15,000 Worth Tattoo
           </h2>
 
-          <p className="text-sm sm:text-base text-[#F5F5F5] font-semibold mb-4 sm:mb-5">
-            Your First Tattoo or Piercing
+          <h3 className="text-4xl sm:text-5xl font-black mb-3 text-accent font-display tracking-tight">
+            FOR JUST ₹6,500
+          </h3>
+
+          <p className="text-xs sm:text-sm text-[#F5F5F5] font-semibold mb-4">
+            Exclusive Launch Celebration Offer
           </p>
 
           {/* Promo Code Box */}
-          <div className="bg-[#121212] border border-white/[0.05] rounded-md p-3 w-full mb-4 sm:mb-5 relative overflow-hidden group">
+          <div className="bg-[#121212] border border-white/[0.05] rounded-md p-3 w-full mb-4 relative overflow-hidden group">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-            <p className="text-[0.55rem] tracking-[0.2em] text-muted-foreground uppercase mb-0.5">Promo Code</p>
+            <p className="text-[0.55rem] tracking-[0.2em] text-muted-foreground uppercase mb-0.5">Use Promo Code</p>
             <p className="text-xl sm:text-2xl font-black text-accent tracking-widest select-all">
               AQUA20
             </p>
           </div>
 
-          <p className="text-[0.62rem] text-[#9A9A9A] mb-5 sm:mb-6 leading-relaxed max-w-[280px]">
-            Limited time offer. Valid for new clients only. Cannot be combined with other offers.
+          <p className="text-[0.62rem] text-[#9A9A9A] mb-5 leading-relaxed max-w-[320px]">
+            Pay just ₹6,500 for tattoos up to 25 sq in (worth ₹15,000). For tattoos larger than 25 sq in, enjoy a flat ₹8,500 discount on your total price!
           </p>
 
           <button

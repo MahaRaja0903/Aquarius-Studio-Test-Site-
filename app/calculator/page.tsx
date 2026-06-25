@@ -10,7 +10,7 @@ const ARTISTS = [
     id: 'aravind',
     name: 'Aravind',
     specialty: 'Realism & Black and Grey',
-    rate: 299,
+    rate: 599,
     portfolioHref: '/artists/aravind',
   },
   {
@@ -35,7 +35,8 @@ export default function CalculatorPage() {
 
   const validateCoupon = (code: string): number => {
     const coupons: Record<string, number> = {
-      AQUA20: 0.20,
+      AQUA20: 0.20, // Now triggers the special launch offer!
+      AQUA6500: 0.20, // Alternative code for the special offer
       AQUA25: 0.25,
       FIRST15: 0.15,
     }
@@ -48,27 +49,50 @@ export default function CalculatorPage() {
     if (type === 'piercing') {
       return { display: '₹1,500 – ₹2,500', raw: 1500 }
     }
-    if (!selectedArtist) {
-      const lo = Math.max(area * 299, 1500)
-      const hi = Math.max(area * 599, 1500)
-      return {
-        display: `₹${lo.toLocaleString('en-IN')} – ₹${hi.toLocaleString('en-IN')}`,
-        raw: lo,
-      }
-    }
-    const artist = ARTISTS.find((a) => a.id === selectedArtist)!
-    const price = Math.max(area * artist.rate, 1500)
+    // Tattoo price: standard rate of 599 per sq in, with a minimum of 1500
+    const price = Math.max(area * 599, 1500)
     return { display: `₹${price.toLocaleString('en-IN')}`, raw: price }
   }
 
   const { display: priceDisplay, raw: basePrice } = calculatePrice()
-  const discountPercent = appliedCoupon ? validateCoupon(appliedCoupon) : 0
-  const discountAmount = Math.round(basePrice * discountPercent)
-  const finalPrice = Math.round(basePrice - discountAmount)
+
+  // Check if the special offer is active (via coupon code or selected package)
+  const isSpecialOfferApplied = type === 'tattoo' && (appliedCoupon === 'AQUA20' || appliedCoupon === 'AQUA6500' || offer === 'special-offer')
+
+  const discountPercent = appliedCoupon && appliedCoupon !== 'AQUA20' && appliedCoupon !== 'AQUA6500' 
+    ? validateCoupon(appliedCoupon) 
+    : 0
+
+  let discountAmount = 0
+  let finalPrice = basePrice
+  let showSpecialOfferBreakdown = false
+
+  if (isSpecialOfferApplied) {
+    showSpecialOfferBreakdown = true
+    if (area <= 25) {
+      // Get 15,000 worth tattoo for just 6,500
+      // If the standard price is already less than 6500, keep standard price (no negative discount)
+      if (basePrice <= 6500) {
+        finalPrice = basePrice
+        discountAmount = 0
+      } else {
+        finalPrice = 6500
+        discountAmount = basePrice - 6500
+      }
+    } else {
+      // Tattoos larger than 25 sq in get a flat 8,500 discount
+      discountAmount = 8500
+      finalPrice = basePrice - 8500
+    }
+  } else if (discountPercent > 0) {
+    discountAmount = Math.round(basePrice * discountPercent)
+    finalPrice = Math.round(basePrice - discountAmount)
+  }
 
   const handleApplyCoupon = () => {
-    if (validateCoupon(couponCode) > 0) {
-      setAppliedCoupon(couponCode)
+    const code = couponCode.toUpperCase()
+    if (validateCoupon(code) > 0 || code === 'AQUA6500') {
+      setAppliedCoupon(code)
       setCouponCode('')
     }
   }
@@ -266,6 +290,9 @@ export default function CalculatorPage() {
                 className="w-full px-4 py-3 bg-background border border-border text-foreground focus:outline-none focus:border-accent transition-colors cursor-pointer"
               >
                 <option value="standard">Standard</option>
+                {type === 'tattoo' && (
+                  <option value="special-offer">Special Launch Offer (₹15k value for ₹6,500)</option>
+                )}
                 <option value="custom">Custom Design</option>
                 <option value="cover-up">Cover-up</option>
               </select>
@@ -313,43 +340,117 @@ export default function CalculatorPage() {
 
             {/* Price Display */}
             <div className="mb-8 space-y-4">
-              {appliedCoupon && selectedArtist && (
-                <div className="p-4 bg-green-900/20 border border-green-700/50">
+              {appliedCoupon && (
+                <div className={`p-4 ${isSpecialOfferApplied ? 'bg-amber-950/20 border border-amber-700/40' : 'bg-green-900/20 border border-green-700/50'}`}>
                   <div className="flex justify-between items-center mb-2">
-                    <p className="text-sm font-semibold text-green-400">Discount Applied</p>
-                    <p className="text-lg font-bold text-green-400">-₹{discountAmount.toLocaleString('en-IN')}</p>
+                    <p className={`text-sm font-bold ${isSpecialOfferApplied ? 'text-accent' : 'text-green-400'}`}>
+                      {isSpecialOfferApplied ? 'Special Launch Offer Applied' : 'Discount Applied'}
+                    </p>
+                    <p className={`text-lg font-black ${isSpecialOfferApplied ? 'text-accent' : 'text-green-400'}`}>
+                      -₹{discountAmount.toLocaleString('en-IN')}
+                    </p>
                   </div>
-                  <p className="text-xs text-green-300">You save {Math.round(discountPercent * 100)}% on this service!</p>
+                  <p className={`text-xs ${isSpecialOfferApplied ? 'text-amber-200' : 'text-green-300'}`}>
+                    {isSpecialOfferApplied 
+                      ? 'You unlocked the ₹15,000 tattoo value for just ₹6,500 offer!' 
+                      : `You save ${Math.round(discountPercent * 100)}% on this service!`}
+                  </p>
                 </div>
               )}
 
               <div className="p-6 bg-background border-2 border-accent">
-                <p className="text-sm text-muted-foreground mb-2 tracking-wide">
-                  {appliedCoupon && selectedArtist ? 'FINAL PRICE' : 'ESTIMATED PRICE'}
+                <p className="text-xs text-muted-foreground mb-2 tracking-widest uppercase">
+                  {isSpecialOfferApplied || appliedCoupon ? 'FINAL PRICE' : 'ESTIMATED PRICE'}
                 </p>
 
-                {appliedCoupon && selectedArtist ? (
+                {isSpecialOfferApplied || appliedCoupon ? (
                   <div>
-                    <p className="text-xs text-muted-foreground line-through mb-2">
+                    <p className="text-xs text-muted-foreground line-through mb-1">
                       ₹{basePrice.toLocaleString('en-IN')}
                     </p>
-                    <p className="text-4xl md:text-5xl font-bold text-accent mb-4">
+                    <p className="text-4xl md:text-5xl font-black text-accent mb-4 font-display">
                       ₹{finalPrice.toLocaleString('en-IN')}
                     </p>
                   </div>
                 ) : (
-                  <p className="text-4xl md:text-5xl font-bold text-accent mb-4">
+                  <p className="text-4xl md:text-5xl font-black text-accent mb-4 font-display">
                     {priceDisplay}
                   </p>
                 )}
 
-                {type === 'tattoo' && selectedArtist && (
+                {type === 'tattoo' && (
                   <p className="text-xs text-muted-foreground mb-2">
-                    {area} sq in × ₹{ARTISTS.find((a) => a.id === selectedArtist)!.rate}/sq in
-                    {area * ARTISTS.find((a) => a.id === selectedArtist)!.rate < 1500 && ' (minimum charge applied)'}
+                    {area} sq in × ₹599/sq in
+                    {basePrice === 1500 && ' (minimum charge of ₹1,500 applied)'}
                   </p>
                 )}
-                <p className="text-xs text-muted-foreground italic">
+
+                {/* Detailed table breakdown */}
+                {showSpecialOfferBreakdown && (
+                  <div className="mt-6 border border-accent/20 bg-[#0a0a0a] rounded-md overflow-hidden text-left">
+                    <div className="p-4 bg-accent/10 border-b border-accent/20">
+                      <p className="text-xs font-bold text-accent tracking-wider uppercase">
+                        Special Launch Offer Breakdown
+                      </p>
+                    </div>
+                    
+                    {/* Mobile Card Layout (visible on mobile only) */}
+                    <div className="block sm:hidden p-4 space-y-3 divide-y divide-white/[0.05]">
+                      <div className="flex justify-between items-center pt-1">
+                        <span className="text-[0.7rem] text-muted-foreground uppercase">Tattoo Size</span>
+                        <span className="text-sm font-bold text-white">{area} sq in</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-[0.7rem] text-muted-foreground uppercase">Price Before Offer</span>
+                        <span className="text-sm font-bold text-white">₹{basePrice.toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-[0.7rem] text-muted-foreground uppercase">Discount Amount</span>
+                        <span className="text-sm font-bold text-green-400">
+                          {discountAmount > 0 ? `-₹${discountAmount.toLocaleString('en-IN')}` : '₹0'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center pt-3">
+                        <span className="text-[0.7rem] text-muted-foreground uppercase">Price After Offer</span>
+                        <span className="text-base font-black text-accent">₹{finalPrice.toLocaleString('en-IN')}</span>
+                      </div>
+                    </div>
+
+                    {/* Desktop Table Layout (hidden on mobile) */}
+                    <div className="hidden sm:block overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-white/[0.08] bg-white/[0.02]">
+                            <th className="p-3 text-[0.65rem] font-bold text-muted-foreground uppercase tracking-wider">Tattoo Size</th>
+                            <th className="p-3 text-[0.65rem] font-bold text-muted-foreground uppercase tracking-wider">Price Before Offer</th>
+                            <th className="p-3 text-[0.65rem] font-bold text-muted-foreground uppercase tracking-wider">Price After Offer</th>
+                            <th className="p-3 text-[0.65rem] font-bold text-muted-foreground uppercase tracking-wider">Discount Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="hover:bg-white/[0.01]">
+                            <td className="p-3 text-sm font-bold text-white">{area} sq in</td>
+                            <td className="p-3 text-sm font-semibold text-white">₹{basePrice.toLocaleString('en-IN')}</td>
+                            <td className="p-3 text-sm font-black text-accent">₹{finalPrice.toLocaleString('en-IN')}</td>
+                            <td className="p-3 text-sm font-bold text-green-400">
+                              {discountAmount > 0 ? `-₹${discountAmount.toLocaleString('en-IN')}` : '₹0'}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    
+                    {area < 11 && (
+                      <div className="p-3 bg-blue-950/25 border-t border-blue-900/40">
+                        <p className="text-[0.68rem] text-blue-300 leading-relaxed italic">
+                          * Note: Since your tattoo size is under 11 sq in, our standard pricing of ₹599/sq in is already lower than the flat ₹6,500 offer price. We have automatically applied the lower price for you!
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <p className="text-xs text-muted-foreground italic mt-3">
                   * Final price may vary based on design complexity
                 </p>
               </div>
